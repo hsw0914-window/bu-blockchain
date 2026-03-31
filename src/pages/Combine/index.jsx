@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Package, Layers } from "lucide-react";
-import { Button } from "../../components/ui/button";
 import { ResultModal } from "../../components/common/ResultModal";
 import { InventoryPanel } from "./components/InventoryPanel";
 import { CombineMode } from "./components/CombineMode";
@@ -34,27 +33,25 @@ const KEYS = [
 ];
 
 export function Combine() {
-  const [viewMode, setViewMode]             = useState("combine");
-  const [activeTab, setActiveTab]           = useState("fragments");
+  const [viewMode, setViewMode]                   = useState("combine");
+  const [activeTab, setActiveTab]                 = useState("fragments");
   const [selectedFragments, setSelectedFragments] = useState([]);
-  const [combining, setCombining]           = useState(false);
-  const [result, setResult]                 = useState(null);
-  const [selectedBox, setSelectedBox]       = useState(null);
-  const [selectedKey, setSelectedKey]       = useState(null);
-  const [opening, setOpening]               = useState(false);
-  const [openResult, setOpenResult]         = useState(null);
+  const [combining, setCombining]                 = useState(false);
+  const [result, setResult]                       = useState(null);
+  const [selectedBox, setSelectedBox]             = useState(null);
+  const [selectedKey, setSelectedKey]             = useState(null);
+  const [opening, setOpening]                     = useState(false);
+  const [openResult, setOpenResult]               = useState(null);
 
   const totalBoxes = BOXES.reduce((s, b) => s + b.count, 0);
   const totalKeys  = KEYS.reduce((s, k) => s + k.count, 0);
 
-  // ── 파편 선택 토글 ───────────────────────────────────────────────────────
   const handleSelectFragment = (id) => {
     setSelectedFragments((prev) =>
       prev.includes(id) ? prev.filter((f) => f !== id) : prev.length < 3 ? [...prev, id] : prev
     );
   };
 
-  // ── 조합 실행 ────────────────────────────────────────────────────────────
   const handleCombine = () => {
     setCombining(true);
     setTimeout(() => {
@@ -68,13 +65,12 @@ export function Combine() {
     setSelectedFragments([]);
   };
 
-  // ── 박스 개봉 ────────────────────────────────────────────────────────────
   const handleOpenBox = () => {
     if (!selectedBox || !selectedKey) return;
     setOpening(true);
     setTimeout(() => {
-      const isFragment  = Math.random() > 0.3;
-      const rarities    = ["일반", "희귀", "영웅", "전설"];
+      const isFragment   = Math.random() > 0.3;
+      const rarities     = ["일반", "희귀", "영웅", "전설"];
       const randomRarity = rarities[Math.floor(Math.random() * rarities.length)];
       setOpenResult({
         type: isFragment ? "fragment" : "nft",
@@ -92,28 +88,60 @@ export function Combine() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto">
-      {/* 모드 선택 버튼 */}
-      <div className="mb-6 flex items-center justify-center gap-4">
-        <Button
-          onClick={() => setViewMode("openBox")}
-          className={`glass ${viewMode === "openBox" ? "neon-border-pink bg-[#ff10f0]/20 text-[#ff10f0]" : "neon-border-cyan text-[#a393d1] hover:text-[#00d9ff]"}`}
+    <div className="max-w-[1400px] mx-auto space-y-6">
+
+      {/* ── 탭 버튼 ─────────────────────────────────────────────────────── */}
+      <div className="flex justify-center">
+        <div
+          className="inline-flex rounded-2xl p-1 gap-1"
+          style={{
+            background: "rgba(16, 6, 32, 0.85)",
+            border: "1px solid rgba(255,16,240,0.25)",
+            boxShadow: "0 0 20px rgba(255,16,240,0.1)",
+          }}
         >
-          <Package className="w-5 h-5 mr-2" />
-          박스 개봉
-        </Button>
-        <Button
-          onClick={() => setViewMode("combine")}
-          className={`glass ${viewMode === "combine" ? "neon-border-pink bg-[#ff10f0]/20 text-[#ff10f0]" : "neon-border-cyan text-[#a393d1] hover:text-[#00d9ff]"}`}
-        >
-          <Layers className="w-5 h-5 mr-2" />
-          파편 조합
-        </Button>
+          {[
+            { id: "openBox", Icon: Package, label: "박스 개봉" },
+            { id: "combine", Icon: Layers,  label: "파편 조합" },
+          ].map(({ id, Icon, label }) => {
+            const active = viewMode === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setViewMode(id)}
+                className="relative flex items-center gap-2.5 px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300"
+                style={
+                  active
+                    ? {
+                        background: "linear-gradient(135deg, rgba(255,16,240,0.3), rgba(189,0,232,0.3))",
+                        color: "#ff10f0",
+                        boxShadow: "0 0 16px rgba(255,16,240,0.4), inset 0 0 12px rgba(255,16,240,0.1)",
+                        border: "1px solid rgba(255,16,240,0.6)",
+                      }
+                    : {
+                        background: "transparent",
+                        color: "#a393d1",
+                        border: "1px solid transparent",
+                      }
+                }
+              >
+                <Icon
+                  className="w-4 h-4"
+                  style={active ? { filter: "drop-shadow(0 0 6px rgba(255,16,240,0.9))" } : {}}
+                />
+                <span style={active ? { textShadow: "0 0 8px rgba(255,16,240,0.7)" } : {}}>
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* 2열 레이아웃: 좌측 인벤토리 + 우측 작업 공간 */}
-      <div className="grid lg:grid-cols-[400px_1fr] gap-6">
-        {/* 좌측: 인벤토리 패널 */}
+      {/* ── 2열 레이아웃 ────────────────────────────────────────────────── */}
+      <div className="grid lg:grid-cols-[340px_1fr] gap-6 items-start">
+
+        {/* 좌측: 인벤토리 */}
         <InventoryPanel
           fragments={FRAGMENTS}
           nfts={NFTS}
@@ -127,7 +155,7 @@ export function Combine() {
         />
 
         {/* 우측: 작업 공간 */}
-        <div className="space-y-6">
+        <div>
           {viewMode === "openBox" ? (
             <OpenBoxMode
               boxes={BOXES}

@@ -91,6 +91,86 @@ function QuoteCard({ blankFilled }) {
   );
 }
 
+// ── 캐릭터 애프터이미지 오버레이 ──────────────────────────────────────────────
+function CharacterAfterimage({ show, fading }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          key="character-overlay"
+          className="fixed inset-0 z-20 pointer-events-none flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: fading ? 0 : 1 }}
+          transition={{ duration: fading ? 3.2 : 1.8, ease: "easeInOut" }}
+        >
+          {/* 실제 캐릭터 이미지 - 잔상/기억 효과 */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            initial={{ scale: 1.08, filter: "blur(18px)" }}
+            animate={{
+              scale: fading ? 1.15 : 1.02,
+              filter: fading ? "blur(28px) saturate(0)" : "blur(6px) saturate(0.15)",
+            }}
+            transition={{ duration: fading ? 3.2 : 1.8, ease: "easeInOut" }}
+          >
+            <img
+              src="/whitebeard.png"
+              alt="화이트비어드"
+              className="w-full h-full object-cover object-top"
+              style={{
+                mixBlendMode: "screen",
+                filter: "grayscale(100%) contrast(0.6) brightness(0.5)",
+              }}
+            />
+          </motion.div>
+
+          {/* 기억 속 장면처럼 — 위아래 그라데이션 비네팅 */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 70% at 50% 40%, transparent 30%, #0a0014 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, #0a0014 0%, transparent 25%, transparent 60%, #0a0014 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to right, #0a0014 0%, transparent 20%, transparent 80%, #0a0014 100%)",
+            }}
+          />
+
+          {/* 핑크빛 기억 틴트 */}
+          <div
+            className="absolute inset-0"
+            style={{ background: "rgba(255,16,240,0.03)", mixBlendMode: "screen" }}
+          />
+
+          {/* 스캔라인 노이즈 */}
+          <div className="absolute inset-0 scanlines opacity-30" />
+
+          {/* "잊혀짐" 텍스트 잔상 */}
+          <motion.p
+            className="absolute bottom-[18%] left-1/2 -translate-x-1/2 text-white/20 text-sm tracking-[0.6em] font-mono whitespace-nowrap select-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: fading ? 0 : 0.35 }}
+            transition={{ duration: 1.2, delay: fading ? 0 : 0.6 }}
+          >
+            MEMORY_LOADING... 기억을 불러오는 중
+          </motion.p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // ── 메인 페이지 ───────────────────────────────────────────────────────────────
 export function Onboarding() {
   const navigate = useNavigate();
@@ -105,7 +185,13 @@ export function Onboarding() {
   const [inputFocused,    setInputFocused]    = useState(false);
   const [mounted,         setMounted]         = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    if (localStorage.getItem("onboarded")) {
+      navigate("/", { replace: true });
+      return;
+    }
+    setMounted(true);
+  }, [navigate]);
 
   const canEnter = nickname.trim().length > 0 && walletConnected && !isAnimating;
 
@@ -120,21 +206,30 @@ export function Onboarding() {
   const handleEnter = useCallback(() => {
     if (!canEnter) return;
     setIsAnimating(true);
+
+    // 1단계: 빈칸에 "잊혀졌을" 채워짐
     setBlankFilled(true);
 
+    // 2단계: 0.9초 후 캐릭터 잔상 등장
     setTimeout(() => {
       setShowCharacter(true);
+
+      // 3단계: 2.4초간 잔상 유지 후 서서히 사라짐
       setTimeout(() => {
         setCharacterFading(true);
+
+        // 4단계: 잔상이 사라지며 페이지 페이드아웃 시작
         setTimeout(() => {
           setPageFading(true);
+
+          // 5단계: 홈 화면으로 전환
           setTimeout(() => {
             localStorage.setItem("onboarded", "true");
             localStorage.setItem("nickname", nickname);
             navigate("/");
-          }, 1200);
-        }, 1800);
-      }, 2200);
+          }, 1300);
+        }, 2000);
+      }, 2400);
     }, 900);
   }, [canEnter, nickname, navigate]);
 
@@ -150,22 +245,8 @@ export function Onboarding() {
     <div className="min-h-screen bg-gradient-to-br from-[#0a0014] via-[#130820] to-[#0d001a] relative overflow-hidden flex items-center justify-center">
       <OnboardingBackground />
 
-      {/* 캐릭터 애프터이미지 */}
-      <AnimatePresence>
-        {showCharacter && (
-          <motion.div
-            key="character-overlay"
-            className="fixed inset-0 z-20 pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: characterFading ? 0 : 0.82 }}
-            transition={{ duration: characterFading ? 2.8 : 1.6, ease: "easeInOut" }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0014] via-transparent to-[#0a0014] opacity-80" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0014] via-transparent to-[#0a0014] opacity-60" />
-            <div className="absolute inset-0 bg-[#ff10f0] opacity-[0.04]" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* 캐릭터 잔상 오버레이 */}
+      <CharacterAfterimage show={showCharacter} fading={characterFading} />
 
       {/* 페이지 페이드아웃 */}
       <AnimatePresence>
@@ -175,7 +256,7 @@ export function Onboarding() {
             className="fixed inset-0 z-50 bg-[#0a0014]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1.1, ease: "easeIn" }}
+            transition={{ duration: 1.2, ease: "easeIn" }}
           />
         )}
       </AnimatePresence>
