@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS 변수 (다크 네온 테마) ───────────────────────────────────────────── */
+@layer base {
+  :root {
+    --background:          270 100% 4%;    /* #0a0014 */
+    --foreground:          260 40% 92%;    /* #e0d9ff */
+    --card:                270 80% 10%;   /* #1a0a2e */
+    --card-foreground:     260 40% 92%;
+    --popover:             270 80% 8%;
+    --popover-foreground:  260 40% 92%;
+    --primary:             300 100% 53%;  /* #ff10f0 */
+    --primary-foreground:  0 0% 100%;
+    --secondary:           270 60% 18%;
+    --secondary-foreground: 260 40% 92%;
+    --muted:               270 50% 15%;
+    --muted-foreground:    265 25% 60%;   /* #a393d1 */
+    --accent:              270 60% 18%;
+    --accent-foreground:   260 40% 92%;
+    --destructive:         0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border:              300 60% 30%;
+    --input:               270 60% 15%;
+    --ring:                300 100% 53%;
+    --radius:              0.75rem;
+  }
+}
+
+/* ── 기본 body ────────────────────────────────────────────────────────────── */
+body {
+  margin: 0;
+  background: #0a0014;
+  color: #e0d9ff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* ── 글래스모피즘 패널 ────────────────────────────────────────────────────── */
+@layer components {
+  .glass {
+    background: rgba(26, 10, 46, 0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 16, 240, 0.18);
+  }
+
+  .glass-strong {
+    background: rgba(16, 6, 32, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 16, 240, 0.22);
+  }
+
+  /* ── 네온 테두리 ─────────────────────────────────────────────────────────── */
+  .neon-border-pink {
+    border: 1px solid rgba(255, 16, 240, 0.55) !important;
+    box-shadow: 0 0 8px rgba(255, 16, 240, 0.25), inset 0 0 8px rgba(255, 16, 240, 0.06);
+  }
+
+  .neon-border-cyan {
+    border: 1px solid rgba(0, 217, 255, 0.55) !important;
+    box-shadow: 0 0 8px rgba(0, 217, 255, 0.25), inset 0 0 8px rgba(0, 217, 255, 0.06);
+  }
+
+  /* ── 네온 텍스트 글로우 ──────────────────────────────────────────────────── */
+  .neon-pink {
+    color: #ff10f0;
+    text-shadow: 0 0 8px rgba(255, 16, 240, 0.85), 0 0 20px rgba(255, 16, 240, 0.45);
+  }
+
+  .neon-cyan {
+    color: #00d9ff;
+    text-shadow: 0 0 8px rgba(0, 217, 255, 0.85), 0 0 20px rgba(0, 217, 255, 0.45);
+  }
+
+  .neon-green {
+    color: #00ff88;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.85), 0 0 20px rgba(0, 255, 136, 0.45);
+  }
+
+  /* ── 크롬/레인보우 텍스트 ───────────────────────────────────────────────── */
+  .chrome-text {
+    background: linear-gradient(135deg, #ff10f0 0%, #bd00e8 30%, #00d9ff 70%, #00ff88 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 12px rgba(255, 16, 240, 0.5));
+  }
+}
+
+/* ── 레트로 그리드 배경 ──────────────────────────────────────────────────── */
+.retro-grid {
+  background-image:
+    linear-gradient(rgba(255, 16, 240, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 16, 240, 0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center center;
+}
+
+/* ── 스캔라인 오버레이 ───────────────────────────────────────────────────── */
+.scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+}
+
+/* ── 스크롤바 다크 스타일 ────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(10, 0, 20, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 16, 240, 0.4);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 16, 240, 0.7);
+}
+
+/* ── 선택 영역 색상 ──────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(255, 16, 240, 0.3);
+  color: #fff;
+}
